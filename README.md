@@ -11,9 +11,17 @@ Change `~/.wakatime.cfg`.
 
 ## Installation
 
+- [lazy.nvim][https://github.com/folke/lazy.nvim].
+
 ```lua
 {
-    "petricavalry/neovim-wakatime",
+    "alanhamlett/neovim-wakatime",
     config = true,
 }
+```
+
+- [packer.nvim](https://github.com/wbthomason/packer.nvim)
+
+```lua
+use({ "alanhamlett/neovim-wakatime", opt = true })
 ```
