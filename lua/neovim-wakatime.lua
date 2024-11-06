@@ -3,6 +3,8 @@ local last_sent_time
 local version = vim.version()
 local user_agent = string.format("neovim/%d.%d.%d neovim-wakatime/0.1.0", version.major, version.minor, version.patch)
 
+local wakatime_command = ""
+
 local function process_cli_args(key, value)
 	if key == "lines" then
 		return { "--lines-in-file", value }
@@ -30,7 +32,7 @@ local function send_heartbeats(is_write)
 		is_write = is_write,
 	}
 
-	local command = { "wakatime" }
+	local command = { wakatime_command }
 	for key, value in pairs(heartbeats) do
 		for _, item in ipairs(process_cli_args(key, value)) do
 			table.insert(command, item)
@@ -42,7 +44,7 @@ local function send_heartbeats(is_write)
 		command,
 		vim.schedule_wrap(function(obj)
 			if obj.code ~= 0 then
-				vim.notify(string.format("failed to upload heartbeats: %s", obj.stderr), vim.log.levels.ERROR)
+				vim.notify(string.format("failed to upload heartbeats: %s %s", obj.stdout, obj.stderr), vim.log.levels.ERROR)
 			end
 		end)
 	)
@@ -51,10 +53,17 @@ end
 local attentiveacting = {}
 
 function attentiveacting.setup()
-	if vim.fn.executable("wakatime") == 0 then
+	if vim.fn.executable("wakatime") == 1 then
+		wakatime_command = "wakatime"
+		vim.notify("found executable `wakatime`", vim.log.levels.DEBUG)
+	elseif vim.fn.executable("wakatime-cli") == 1 then
+		wakatime_command = "wakatime-cli"
+		vim.notify("found executable `wakatime-cli`", vim.log.levels.DEBUG)
+	else
 		vim.notify("failed to find executable `wakatime`", vim.log.levels.ERROR)
 		return
 	end
+
 	vim.api.nvim_create_autocmd("BufEnter", {
 		callback = function()
 			send_heartbeats(false)

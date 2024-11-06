@@ -7,6 +7,10 @@ A Wakatime plugin for Neovim write in Lua.
 Install
 [wakatime-cli](https://github.com/wakatime/wakatime-cli).
 
+```console
+go install github.com/wakatime/wakatime-cli@latest
+```
+
 Change `~/.wakatime.cfg`.
 
 ## Installation
