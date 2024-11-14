@@ -76,7 +76,7 @@ function attentiveacting.setup()
 	})
 	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
 		callback = function()
-			if vim.loop.gettimeofday() - last_sent_time >= 60 then
+			if vim.loop.gettimeofday() - last_sent_time >= 120 then
 				send_heartbeats(false)
 			end
 		end,
