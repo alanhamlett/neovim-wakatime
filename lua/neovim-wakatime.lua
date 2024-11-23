@@ -19,6 +19,9 @@ local function process_cli_args(key, value)
 end
 
 local function send_heartbeats(is_write)
+	if (vim.bo.buftype ~= "") then
+		return
+	end
 	last_sent_time = vim.loop.gettimeofday()
 	local row, col = unpack(vim.api.nvim_win_get_cursor(0))
 
@@ -55,10 +58,8 @@ local attentiveacting = {}
 function attentiveacting.setup()
 	if vim.fn.executable("wakatime") == 1 then
 		wakatime_command = "wakatime"
-		vim.notify("found executable `wakatime`", vim.log.levels.DEBUG)
 	elseif vim.fn.executable("wakatime-cli") == 1 then
 		wakatime_command = "wakatime-cli"
-		vim.notify("found executable `wakatime-cli`", vim.log.levels.DEBUG)
 	else
 		vim.notify("failed to find executable `wakatime`", vim.log.levels.ERROR)
 		return
