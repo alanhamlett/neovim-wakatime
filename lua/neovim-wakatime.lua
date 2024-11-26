@@ -53,9 +53,9 @@ local function send_heartbeats(is_write)
 	)
 end
 
-local attentiveacting = {}
+local neovim_wakatime = {}
 
-function attentiveacting.setup()
+function neovim_wakatime.setup()
 	if vim.fn.executable("wakatime") == 1 then
 		wakatime_command = "wakatime"
 	elseif vim.fn.executable("wakatime-cli") == 1 then
@@ -84,4 +84,4 @@ function attentiveacting.setup()
 	})
 end
 
-return attentiveacting
+return neovim_wakatime
