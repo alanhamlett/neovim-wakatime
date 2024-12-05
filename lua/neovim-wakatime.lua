@@ -5,49 +5,41 @@ local user_agent = string.format("neovim/%d.%d.%d neovim-wakatime/0.1.0", versio
 
 local wakatime_command = ""
 
-local function process_cli_args(key, value)
-	if key == "lines" then
-		return { "--lines-in-file", value }
-	end
-	if key == "is_write" then
-		if value == false then
-			return {}
-		end
-		return { "--write" }
-	end
-	return { string.format("--%s", key), value }
-end
-
 local function send_heartbeats(is_write)
-	if (vim.bo.buftype ~= "") then
+	if vim.bo.buftype ~= "" then
 		return
 	end
 	last_sent_time = vim.loop.gettimeofday()
 	local row, col = unpack(vim.api.nvim_win_get_cursor(0))
 
-	local heartbeats = {
-		entity = vim.api.nvim_buf_get_name(0),
-		time = last_sent_time,
-		language = vim.bo.filetype,
-		lines = vim.api.nvim_buf_line_count(0),
-		lineno = row,
-		cursorpos = col + 1,
-		is_write = is_write,
+	local command = {
+		wakatime_command,
+		"--entity",
+		vim.api.nvim_buf_get_name(0),
+		"--time",
+		last_sent_time,
+		"--language",
+		vim.bo.filetype,
+		"--lines-in-file",
+		vim.api.nvim_buf_line_count(0),
+		"--lineno",
+		row,
+		"--cursorpos",
+		col + 1,
+		"--plugin",
+		user_agent
 	}
-
-	local command = { wakatime_command }
-	for key, value in pairs(heartbeats) do
-		for _, item in ipairs(process_cli_args(key, value)) do
-			table.insert(command, item)
-		end
+	if is_write == true then
+		table.insert(command, "--write")
 	end
-	table.insert(command, "--plugin")
-	table.insert(command, user_agent)
 	vim.system(
 		command,
 		vim.schedule_wrap(function(obj)
 			if obj.code ~= 0 then
-				vim.notify(string.format("failed to upload heartbeats: %s %s", obj.stdout, obj.stderr), vim.log.levels.ERROR)
+				vim.notify(
+					string.format("failed to upload heartbeats: %s %s", obj.stdout, obj.stderr),
+					vim.log.levels.ERROR
+				)
 			end
 		end)
 	)
