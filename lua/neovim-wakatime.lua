@@ -18,7 +18,7 @@ local function send_heartbeats(is_write)
 		vim.api.nvim_buf_get_name(0),
 		"--time",
 		last_sent_time,
-		"--language",
+		"--alternate-language",
 		vim.bo.filetype,
 		"--lines-in-file",
 		vim.api.nvim_buf_line_count(0),
